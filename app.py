@@ -20,6 +20,18 @@ def conv_square(img_path):
   square_img = img.crop((left, 0, right, size)).resize((224, 224))
   return square_img
 
+def set_txt(result):
+  if result > 0.9:
+    txt = '1000年に1人の逸材です!!'
+  elif result > 0.7:
+    txt = '10年に1人の逸材です。'
+  elif result > 0.5:
+    txt = '学校一の逸材です。'
+  elif result > 0.3:
+    txt = '町内会一の逸材です。'
+  else:
+    txt = 'ファンの方ですか？'
+  return txt
 
 # 画像をアップロードするフォームを作成
 uploaded_image = st.file_uploader("画像をアップロードしてください", type=["jpg", "png", "jpeg"])
@@ -40,7 +52,7 @@ if uploaded_image is not None:
   # モデルの読み込み
   if 'model' not in st.session_state:
     latest_iteration.text('Load Model ...')
-    st.session_state['model'] = load_model('bestmodel.h5')
+    st.session_state['model'] = load_model('bestmodel')
   bar.progress(50)
   # 予測
   latest_iteration.text('Predict ...')
@@ -49,4 +61,6 @@ if uploaded_image is not None:
   latest_iteration.text('Finish!!')
   bar.progress(100)
   st.title(f'ハシカン度: {result*100:.2f}%')
+  txt = set_txt(result)
+  st.text(txt)
   
