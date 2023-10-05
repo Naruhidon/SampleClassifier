@@ -1,6 +1,6 @@
 import streamlit as st
 from keras.models import load_model
-from PIL import Image
+from PIL import Image, ImageOps
 import numpy as np
 
 
@@ -9,11 +9,8 @@ def conv_square(img_path):
   引数の画像に余白を追加して、正方形の画像を返す関数
   """
   img = Image.open(img_path)
+  img = ImageOps.exif_transpose(img)  # 画像を適切な向きに補正する
   width, height = img.size
-  # 余白追加
-  # size = max(width, height)
-  # square_img = Image.new('RGB', (size, size), 'white')
-  # square_img.paste(img, ((size - width) // 2, (size - height) // 2))
   # 切り取り
   size = min(width, height)
   left = (width - size) / 2
@@ -33,7 +30,7 @@ if uploaded_image is not None:
   st.image(img, caption="アップロードされた画像", width=224)
   # 画像の形式を変更
   img_array = np.array(img)
-  img_array = img_array.astype('float32') / 255.0
+  img_array = img_array.astype('float32')
   input_array = np.expand_dims(img_array, 0)
   
   # プログレスバーの設定
@@ -42,9 +39,11 @@ if uploaded_image is not None:
   bar = st.progress(0)
   # モデルの読み込み
   if 'model' not in st.session_state:
-    st.session_state['model'] = load_model('my_model')
+    latest_iteration.text('Load Model ...')
+    st.session_state['model'] = load_model('bestmodel.h5')
   bar.progress(50)
   # 予測
+  latest_iteration.text('Predict ...')
   result = st.session_state['model'].predict(input_array)
   result = 1 - result[0][0]
   latest_iteration.text('Finish!!')
