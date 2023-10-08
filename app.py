@@ -52,7 +52,7 @@ if uploaded_image is not None:
   # モデルの読み込み
   if 'model' not in st.session_state:
     latest_iteration.text('Load Model ...')
-    st.session_state['model'] = load_model('bestmodel')
+    st.session_state['model'] = load_model('bestmodel_tf')
   bar.progress(50)
   # 予測
   latest_iteration.text('Predict ...')
